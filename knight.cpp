@@ -44,62 +44,43 @@ void StatusDeadline(int & HP, int & level, int & StatusCheck1, int & StatusCheck
     }
 }
 
+void damageCalculator(string index, int & HP, int & level, int MonsterLevel)
+{
+    float baseDamage[6];
+    baseDamage[1] = 1;
+    baseDamage[2] = 1.5;
+    baseDamage[3] = 4.5;
+    baseDamage[4] = 7.5;
+    baseDamage[5] = 9.5;
+    char x;
+    if (index.size() == 1) x = index[0];
+    if (MonsterLevel < level){
+        if (level == 10) level = level;
+        else level++;
+    }
+    else if (MonsterLevel > level){
+        int damage = baseDamage[x - '0'] * MonsterLevel * 10;
+        HP -= damage;
+    }
+}
+
+void MushMario(int & HP, int & level, int & phoenixdown){
+    int x = ((level + phoenixdown) % 5 + 1) * 3;
+    int count = 0;
+    int s = 0;
+    for (int i = 99; i >= 10; i--){
+        if (i % 2 == 1){
+            s += i;
+            count++;
+        } 
+        if (count == x) break;
+    }
+}
+
 void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, int & maidenkiss, int & BadEffect1, int & BadEffect2){
-    int levelSave = level;
-    int MonsterLevel;
-    int EffectCheck1 = 0;
+    int levelSave = level, MonsterLevel;
     MonsterLevel = levelO(x);
-    int damage;
-    if (index == "1"){
-        if (MonsterLevel < level){
-            if (level == 10) level = level;
-            else level++;
-        }
-        else if (MonsterLevel > level){
-            damage = 1 * MonsterLevel * 10;
-            HP -= damage;
-        }
-    }
-    if (index == "2"){
-        if (MonsterLevel < level){
-            if (level == 10) level = level;
-            else level++;
-        }
-        else if (MonsterLevel > level){
-            damage = 1.5 * MonsterLevel * 10;
-            HP -= damage;
-        }
-    }
-    if (index == "3"){
-        if (MonsterLevel < level){
-            if (level == 10) level = level;
-            else level++;
-        }
-        else if (MonsterLevel > level){
-            damage = 4.5 * MonsterLevel * 10;
-            HP -= damage;
-        }
-    }
-    if (index == "4"){
-        if (MonsterLevel < level){
-            if (level == 10) level = level;
-            else level++;
-        }
-        else if (MonsterLevel > level){
-            damage = 7.5 * MonsterLevel * 10;
-            HP -= damage;
-        }
-    }
-    if (index == "5"){
-        if (MonsterLevel < level){
-            if (level == 10) level = level;
-            else level++;
-        }
-        else if (MonsterLevel > level){
-            damage = 9.5 * MonsterLevel * 10;
-            HP -= damage;
-        }
-    }
+    damageCalculator(index, HP, level, MonsterLevel);
     if (index == "6"){
         if (MonsterLevel < level){
             if (level == 10) level = level;
@@ -138,7 +119,6 @@ void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, i
 void EventProcess(string event[], int size, int & HP, int & level, int & remedy, int & maidenkiss, int & phoenixdown, int & rescue){
     int levelCheck = 0, maxHP = HP, BadEffect1 = 0, BadEffect2 = 0, StatusCheck1 = 0, StatusCheck2 = 0, levelSave = level;
     for (int i = 0; i < size; i++){
-        StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
         if (event[i] == "0"){
             rescue = 1;
             break;
@@ -146,6 +126,7 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
         levelCheck = levelO(i + 1);
         if (level == levelCheck){
             StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
+            StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
             continue;
         }
         else {
@@ -158,6 +139,7 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
                 else rescue = 0;
             }
             StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
+            StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
         }
     }
     if (HP > 0) rescue = 1;  
