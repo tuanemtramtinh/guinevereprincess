@@ -54,17 +54,19 @@ void damageCalculator(string index, int & HP, int & level, int MonsterLevel)
     baseDamage[5] = 9.5;
     char x;
     if (index.size() == 1) x = index[0];
+    int temp = x - '0';
     if (MonsterLevel < level){
         if (level == 10) level = level;
         else level++;
     }
     else if (MonsterLevel > level){
-        int damage = baseDamage[x - '0'] * MonsterLevel * 10;
+        int damage = baseDamage[temp] * MonsterLevel * 10;
         HP -= damage;
     }
+    
 }
 
-void MushMario(int & HP, int & level, int & phoenixdown){
+void MushMario(int & HP, int level, int phoenixdown, int maxHP){
     int x = ((level + phoenixdown) % 5 + 1) * 3;
     int count = 0;
     int s = 0;
@@ -75,13 +77,34 @@ void MushMario(int & HP, int & level, int & phoenixdown){
         } 
         if (count == x) break;
     }
+    HP = HP + (s % 100);
+    if (maxHP < HP) HP = maxHP;
 }
 
-void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, int & maidenkiss, int & BadEffect1, int & BadEffect2){
+void MushFibo(int & HP){
+    int arr[18];
+    arr[1] =1; arr[2] = 1;
+    for (int i = 3; i < 17; i++) arr[i] = arr[i - 1] + arr[i - 2];
+    if (HP > 1){
+        for (int i = 16; i >= 1; i--){
+            if (HP > arr[i]){
+                HP = arr[i];
+                break;
+            }
+        }
+    }
+    else HP = 1;
+}
+
+void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, int & maidenkiss, int & phoenixdown, int & BadEffect1, int & BadEffect2, int maxHP){
+    string Mush_Ghost_Event;
+    if (index.size() > 2){
+        Mush_Ghost_Event = index.substr(0,2);
+    }
     int levelSave = level, MonsterLevel;
     MonsterLevel = levelO(x);
-    damageCalculator(index, HP, level, MonsterLevel);
-    if (index == "6"){
+    if (index == "1" || index == "2" || index == "3" || index == "4" || index == "5") damageCalculator(index, HP, level, MonsterLevel);
+    else if (index == "6"){
         if (MonsterLevel < level){
             if (level == 10) level = level;
             else level = level + 2;
@@ -97,7 +120,7 @@ void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, i
             }
         }
     }
-    if (index == "7"){
+    else if (index == "7"){
         if (MonsterLevel < level){
             if (level == 10) level = level;
             else level = level + 2;
@@ -112,6 +135,12 @@ void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, i
                 else BadEffect2 = 3;
             }
         }
+    }
+    else if (index == "11"){
+        MushMario(HP, level, phoenixdown, maxHP);
+    }
+    else if (index == "12"){
+        MushFibo(HP);
     }
     
 }
@@ -130,13 +159,16 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
             continue;
         }
         else {
-            Dungeon_Process(event[i], i + 1, level, HP, remedy, maidenkiss, BadEffect1, BadEffect2);
+            Dungeon_Process(event[i], i + 1, level, HP, remedy, maidenkiss, phoenixdown, BadEffect1, BadEffect2, maxHP);
             if (HP < 0) {
                 if (phoenixdown >= 1){
                     HP = maxHP;
                     phoenixdown--;
                 }
-                else rescue = 0;
+                else{
+                    rescue = 0;
+                    break;
+                }
             }
             StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
             StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
@@ -176,5 +208,4 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     rescue = -1;
     EventProcess(event, EventElement, HP, level, remedy, maidenkiss, phoenixdown, rescue);
     display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
-
 }
