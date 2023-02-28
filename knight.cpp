@@ -24,13 +24,13 @@ bool PrimeCheck(int x){
     return true;
 }
 
-bool ArthurCheck(int HP){
-    if (HP == 999) return true;
+bool ArthurCheck(int maxHP){
+    if (maxHP == 999) return true;
     return false;
 }
 
-bool LancelotCheck(int HP){
-    if (PrimeCheck(HP)) return true;
+bool LancelotCheck(int maxHP){
+    if (PrimeCheck(maxHP)) return true;
     return false;
 }
 
@@ -66,7 +66,7 @@ void StatusDeadline(int & HP, int & level, int & StatusCheck1, int & StatusCheck
 
 //DAMAGE CALCULATOR ------------------------------------------------------------------------------------
 
-void damageCalculator(string index, int & HP, int & level, int MonsterLevel)
+void damageCalculator(string index, int & HP, int & level, int MonsterLevel, int maxHP)
 {
     float baseDamage[6];
     baseDamage[1] = 1;
@@ -77,9 +77,9 @@ void damageCalculator(string index, int & HP, int & level, int MonsterLevel)
     char x;
     if (index.size() == 1) x = index[0];
     int temp = x - '0';
-    if (MonsterLevel < level || LancelotCheck(HP) == true){
-        if (level == 10) level = level;
-        else level++;
+    if (MonsterLevel < level || LancelotCheck(maxHP) == true || ArthurCheck(maxHP) == true){
+        level++;
+        if (level >= 10) level = 10;
     }
     else if (MonsterLevel > level){
         int damage = baseDamage[temp] * MonsterLevel * 10;
@@ -101,7 +101,11 @@ void MushMario(int & HP, int level, int phoenixdown, int maxHP){
         if (count == x) break;
     }
     HP = HP + (s % 100);
-    while (PrimeCheck(HP) != 1) HP++;
+    bool check = false;
+    while (check == false){
+        HP++;
+        if (PrimeCheck(HP)) check = true;
+    }
     if (maxHP < HP) HP = maxHP;
 }
 
@@ -127,7 +131,7 @@ void MushFibo(int & HP){
 //MUSH_GHOST CODE 1 PROCESS----------------------------------------
 
 void Mush_Ghost_Code_1(int n, int arr[], int & HP, int maxHP){
-    int maxIndex, minIndex, max = -INT_MAX, min = INT_MAX;
+    int maxIndex; int minIndex; int max = -999999; int min = 999999;
     for (int i = 0; i < n; i++){
         if (max <= arr[i]){
             max = arr[i];
@@ -140,12 +144,13 @@ void Mush_Ghost_Code_1(int n, int arr[], int & HP, int maxHP){
     }
     HP = HP - (maxIndex + minIndex);
     if (HP > maxHP) HP = maxHP;
+    //cout << HP << endl;
 }
 
 //MUSH_GHOST CODE 2 PROCESS----------------------------------------
 
 void Mush_Ghost_Code_2(int n, int arr[], int & HP, int maxHP){
-    int max = -INT_MAX, maxIndex, count = 0, mtx = -2, mti = -3;
+    int max = -999999; int maxIndex; int count = 0; int mtx = -2; int mti = -3;
     bool check1 = false, check2 = false;
     for (int i = 0; i < n; i++) if (max < arr[i]) max = arr[i];
     for (int i = 0; i < n; i++) if (max == arr[i]){
@@ -196,6 +201,7 @@ void Mush_Ghost_Code_2(int n, int arr[], int & HP, int maxHP){
                 }
             }
         }
+        //cout << check1 << " " << check2 << endl;
         if (check1 == true && check2 == true){
             HP = HP - (max + maxIndex);
         }
@@ -205,6 +211,7 @@ void Mush_Ghost_Code_2(int n, int arr[], int & HP, int maxHP){
         HP = HP - (mtx + mti);
     }
     if (HP > maxHP) HP = maxHP;
+    //cout << HP << endl;
 }
 
 //MUSH_GHOST CODE 3 PROCESS----------------------------------------
@@ -214,12 +221,12 @@ void Mush_Ghost_Code_3(int n, int arr[], int & HP, int maxHP){
     for (int i = 0; i < n; i++) temp[i] = arr[i];
     for (int i = 0; i < n; i++){
         if (temp[i] < 0){
-            temp[i] = -temp[i];
-            temp[i] = (17 * arr[i] + 9) % 257;
+            temp[i] = -1 * temp[i];
+            temp[i] = (17 * temp[i] + 9) % 257;
         }
-        else temp[i] = (17 * arr[i] + 9) % 257;
+        else temp[i] = (17 * temp[i] + 9) % 257;
     }
-    int max = -INT_MAX, min = INT_MAX, maxIndex, minIndex;
+    int max = -999999; int min = 999999; int maxIndex; int minIndex;
     for (int i = 0; i < n; i++){
         if (temp[i] > max){
             max = temp[i];
@@ -232,6 +239,7 @@ void Mush_Ghost_Code_3(int n, int arr[], int & HP, int maxHP){
     }
     HP = HP - (maxIndex + minIndex);
     if (HP > maxHP) HP = maxHP;
+    //cout << HP << endl;
 }
 
 //MUSH_GHOST CODE 4 PROCESS----------------------------------------
@@ -241,7 +249,7 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
     for (int i = 0; i < n; i++) temp[i] = arr[i];
     for (int i = 0; i < n; i++){
         if (temp[i] < 0){
-            temp[i] = -temp[i];
+            temp[i] = -1 * temp[i];
             temp[i] = (17 * temp[i] + 9) % 257;
         }
         else temp[i] = (17 * temp[i] + 9) % 257;
@@ -274,6 +282,7 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
     }
     HP = HP - (max2_3x + max2_3i);
     if (HP > maxHP) HP = maxHP;
+    //cout << HP << endl;
 }
 
 //MUSH_GHOST MAIN PROCESS------------------------------------------------------------------------------------------
@@ -281,7 +290,7 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
 void Mush_Ghost_Process(string index, int & HP, int & level, int & remedy, int & maidenkiss, int & phoenixdown, int & rescue, string mush_ghost, int maxHP){
     //INPUT SECTION --------------------------------------
     int n, arr[1000];
-    int maxElement = -INT_MAX, minElement = INT_MAX;
+    int maxElement = -999999; int minElement = 999999;
     ifstream infilenew;
     infilenew.open(mush_ghost);
     string N;
@@ -292,48 +301,70 @@ void Mush_Ghost_Process(string index, int & HP, int & level, int & remedy, int &
     for (int i = 0; i < NumberSequence.size(); i++) if (NumberSequence[i] == ',') NumberSequence[i] = ' ';
     istringstream str(NumberSequence);
     for (int i = 0; i < n; i++) str >> arr[i];
+    /*cout << n << endl;
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << endl;*/
     //PROCESS
     for (int i = 2; i < index.size(); i++){
-        if (index[i] == '1') Mush_Ghost_Code_1(n, arr, HP, maxHP);
-        if (index[i] == '2') Mush_Ghost_Code_2(n, arr, HP, maxHP);
-        if (index[i] == '3') Mush_Ghost_Code_3(n, arr, HP, maxHP);
-        if (index[i] == '4') Mush_Ghost_Code_4(n, arr, HP, maxHP);
+        if (index[i] == '1')
+            Mush_Ghost_Code_1(n, arr, HP, maxHP);
+        if (index[i] == '2')
+            Mush_Ghost_Code_2(n, arr, HP, maxHP);
+        if (index[i] == '3')
+            Mush_Ghost_Code_3(n, arr, HP, maxHP);
+        if (index[i] == '4')
+            Mush_Ghost_Code_4(n, arr, HP, maxHP);
+        if (HP <= 0) break;
     }
 }
 
 //ASCLEPIUS PROCESS ---------------------------------------------------------------------------------
 
-void Asclepius_Process(string asclpius_pack, int & remedy, int & phoenixdown, int & maidenkiss){
+void Asclepius_Process(string asclepius_pack, int & remedy, int & phoenixdown, int & maidenkiss){
     static int Asclepius_Meet = 0;
     if (Asclepius_Meet == 0){
+        int potionCount = 0;
         ifstream infile;
-        infile.open(asclpius_pack);
-        int n, t;
-        infile >> n;
-        infile >> t;
-        int potionCount = 0, x;
-        for (int i  = 0; i < n; i++){
+        infile.open(asclepius_pack);
+        int n, t; string N,T;
+        getline(infile, N);
+        istringstream NN(N);
+        NN >> n;
+        getline(infile, T);
+        istringstream TT(T);
+        TT >> t;
+        int arr[n][t];
+        //cout << n << " " << t << endl;
+        for (int i = 0; i < n; i++){
+            string s;
+            getline(infile, s);
+            istringstream str(s);
             for (int j = 0; j < t; j++){
-                infile >> x;
+                str >> arr[i][j];
+            }
+        }
+        //cout << n << " " << t << endl;
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < t; j++){
                 if (potionCount == 3) continue;
-                else{
-                    if (x == 16){
-                        remedy++;
-                        potionCount++;
-                    }
-                    if (x == 17){
+                else if (arr[i][j] == 16){
+                    remedy++;
+                    potionCount++;
+                }
+                else if (arr[i][j] == 17){
                         maidenkiss++;
                         potionCount++;
                     }
-                    if (x == 18){
+                else if (arr[i][j] == 18){
                         phoenixdown++;
                         potionCount++;
                     }
-                }
             }
             potionCount = 0;
         }
-        infile.close();
+        if (remedy > 99) remedy = 99;
+        if (maidenkiss > 99) maidenkiss = 99;
+        if (phoenixdown > 99) phoenixdown = 99;
         Asclepius_Meet++;
     }
 }
@@ -370,53 +401,57 @@ void Merlin_Process(string merlin_pack, int & HP){
     }
 }
 
+//SHAMAN & VAJSH PROCESS (APPLY FOR EVENT 6 AND EVENT 7) ----------------------------------------------------------------------
+
+void Shaman_Event(int & HP, int & BadEffect1, int & remedy){
+   // if (HP < 5) HP = 1; else HP /= 5;
+    if (remedy >= 1){
+        remedy--;
+    }
+    else{
+        if (HP < 5) HP = 1;
+        else HP /= 5;
+        BadEffect1 = 3;
+    }
+}
+
+void Vajsh_Event(int & level, int levelSave, int & BadEffect2, int & maidenkiss){
+    level = 1;
+    if (maidenkiss >= 1){
+        level = levelSave;
+        maidenkiss--;
+    }
+    else BadEffect2 = 3;
+}
+
+void Witch_Process(string index, int & HP, int & remedy, int & maidenkiss, int & level, int MonsterLevel, int & BadEffect1, int & BadEffect2, int levelSave, int maxHP){
+    if (MonsterLevel < level || LancelotCheck(maxHP) == true){
+        level += 2;
+        if (level >= 10) level = 10;
+    }
+    else if (MonsterLevel > level){
+        if (BadEffect1 == 0 && BadEffect2 == 0){
+            if (index == "6") Shaman_Event(HP, BadEffect1, remedy);
+            if (index == "7") Vajsh_Event(level, levelSave, BadEffect2, maidenkiss);
+        }
+    }
+}
+
 //DUNGEON_PROCESS(APPLY FOR EVENT 1 -> 7)-----------------------------------------------------------------------------
 
 void Dungeon_Process(string index, int x, int & level, int & HP, int & remedy, int & maidenkiss, int & phoenixdown, int & BadEffect1, int & BadEffect2, int maxHP, int & levelSave){
     levelSave = level;
     int MonsterLevel;
     MonsterLevel = levelO(x);
-    if (index == "1" || index == "2" || index == "3" || index == "4" || index == "5") damageCalculator(index, HP, level, MonsterLevel);
-    else if (index == "6"){
-        if (MonsterLevel < level || LancelotCheck(HP) == true){
-            if (level == 10) level = level;
-            else level = level + 2;
-        }
-        else if (MonsterLevel > level){
-            if (BadEffect1 == 0 && BadEffect2 == 0){
-                if (HP < 5) HP = 1;
-                else HP = HP / 5;
-                if (remedy >= 1){
-                    HP = HP * 5;
-                    remedy--;
-                }
-                else BadEffect1 = 3;
-            }
-        }
-    }
-    else if (index == "7"){
-        if (MonsterLevel < level || LancelotCheck(HP) == true){
-            if (level == 10) level = level;
-            else level = level + 2;
-        }
-        else if (MonsterLevel > level){
-            if (BadEffect1 == 0 && BadEffect2 == 0){
-                level = 1;
-                if (maidenkiss >= 1){
-                    level = levelSave;
-                    maidenkiss--;
-                }
-                else BadEffect2 = 3;
-            }
-        }
-    }
+    if (index == "1" || index == "2" || index == "3" || index == "4" || index == "5") damageCalculator(index, HP, level, MonsterLevel, maxHP);
+    else if (index == "6" || index == "7") Witch_Process(index, HP, remedy, maidenkiss, level, MonsterLevel, BadEffect1, BadEffect2, levelSave, maxHP);
 }
 
 //BOWSER APPLY FOR EVENT 99 ---------------------------------------------------------------------------------------
 
-bool Bowser_Process(int & level, int HP){
-    if (ArthurCheck(HP)) return true;
-    if (LancelotCheck(HP) && level >= 8){
+bool Bowser_Process(int & level, int maxHP){
+    if (ArthurCheck(maxHP)) return true;
+    if (LancelotCheck(maxHP) && level >= 8){
         level = 10;
         return true;
     }
@@ -456,7 +491,8 @@ void PickingUpProcess(string index, string mush_ghost, string asclepius_pack, st
 void EventProcess(string event[], int size, int & HP, int & level, int & remedy, int & maidenkiss, int & phoenixdown, int & rescue, string mush_ghost, string asclepius_pack, string merlin_pack){
     int levelCheck = 0, maxHP = HP, BadEffect1 = 0, BadEffect2 = 0, StatusCheck1 = 0, StatusCheck2 = 0, levelSave = level;
     for (int i = 0; i < size; i++){
-        if (event[i] == "0" || ArthurCheck(HP) == true){
+        //cout << event[i] << " ";
+        if (event[i] == "0"){
             rescue = 1;
             display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
             break;
@@ -466,7 +502,6 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
             if (level == levelCheck){
                 StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
                 StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
-                continue;
             }
             else {
                 Dungeon_Process(event[i], i + 1, level, HP, remedy, maidenkiss, phoenixdown, BadEffect1, BadEffect2, maxHP, levelSave);
@@ -478,6 +513,11 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
                             StatusCheck1 = 1;
                             StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
                         }
+                        else {
+                            rescue = 0;
+                            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
+                            break;
+                        }
                     }
                     else if (BadEffect2 != 0){
                         if (phoenixdown >= 1){
@@ -485,6 +525,11 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
                             BadEffect2 = 0;
                             StatusCheck2 = 1;
                             StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
+                        }
+                        else {
+                            rescue = 0;
+                            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
+                            break;
                         }
                     }
                     else if (phoenixdown >= 1){
@@ -502,15 +547,18 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
             }
         }
         else if (event[i] == "99"){
-            if (Bowser_Process(level, HP) == false){
+            if (Bowser_Process(level, maxHP) == false){
                 rescue = 0;
-                display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
                 break;
             }
+            StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
+            StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
         }
         else if (event[i] == "18"){
             Merlin_Process(merlin_pack, HP);
             if (HP > maxHP) HP = maxHP;
+            StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
+            StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
         }
         else if (event[i] == "19"){
             Asclepius_Process(asclepius_pack, remedy, phoenixdown, maidenkiss);
@@ -547,6 +595,7 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
             StatusCheck(event[i], BadEffect1, BadEffect2, StatusCheck1, StatusCheck2);
             StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave);
         }
+        //display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
         if (i == size - 1) {
             if (HP > 0) rescue = 1; 
             display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
@@ -567,13 +616,15 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     infile.open(file_input);
     string str1, str2, str3;
     getline(infile, str1);
+    //cout << str1 << endl;
     istringstream s1(str1);
     while (s1){
         s1 >> HP >> level >> remedy >> maidenkiss >> phoenixdown >> rescue;
     }
     getline(infile, str2);
+    //cout << str2 << endl;
     istringstream s2(str2);
-    string event[100];
+    string event[100000];
     int i = 0;
     while (s2){
         if (s2){
@@ -583,13 +634,17 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     }
     int EventElement = i - 1;
     getline(infile, str3);
-    for (int i = 0; i < str3.size(); i++)
-        if (str3[i] == ',') str3[i] = ' ';
     string mush_ghost, asclepius_pack, merlin_pack;
-    istringstream s3(str3);
-    s3 >> mush_ghost >> asclepius_pack >> merlin_pack;
+    int CheckPositionComma1 = str3.find(',');
+    int CheckPositionComma2 = str3.find(',', CheckPositionComma1 + 1);
+    if (CheckPositionComma1 == 0) mush_ghost = "";
+    else mush_ghost = str3.substr(0, CheckPositionComma1);
+    if (CheckPositionComma2 == 0) merlin_pack = "";
+    else merlin_pack = str3.substr(CheckPositionComma2 + 1, str3.size() -  CheckPositionComma2);
+    if (CheckPositionComma2 - CheckPositionComma1 == 1) asclepius_pack = "";
+    else asclepius_pack = str3.substr(CheckPositionComma1 + 1, CheckPositionComma2 - CheckPositionComma1 - 1);
     //Input Section ------------------------------------------------------------
     rescue = -1;
-    display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
+    //display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
     EventProcess(event, EventElement, HP, level, remedy, maidenkiss, phoenixdown, rescue, mush_ghost, asclepius_pack, merlin_pack);
 }
