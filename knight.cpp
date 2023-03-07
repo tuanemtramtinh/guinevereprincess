@@ -285,7 +285,9 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
                     if (b[i] > b[j]) swap(b[i], b[j]);
                }
             }
-            max2_3x = b[1];
+            if (b[1] == b[2] ) max2_3x = b[0];
+            else if (b[0] == b[1]) max2_3x = b[0];
+            else max2_3x = b[1];
             for (int i = 0; i < 3; i++){
                 if (max2_3x == temp[i]){
                     max2_3i = i;
@@ -294,6 +296,22 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
             }
         }
         //cout << max2_3i << " " << max2_3x;
+    }
+    else if (n == 2){
+        int a, b;
+        a = temp[0];
+        b = temp[1];
+        if (a < b){
+            max2_3i = 0;
+            max2_3x = a;
+        }
+        else if (b < a){
+            max2_3i = 1;
+            max2_3x = b;
+        }
+        else if (a == b){
+          max2_3x = -5; max2_3i = -7;  
+        }
     }
     else{
         max2_3x = -5; max2_3i = -7;
@@ -393,6 +411,7 @@ void Asclepius_Process(string asclepius_pack, int & remedy, int & phoenixdown, i
         if (maidenkiss > 99) maidenkiss = 99;
         if (phoenixdown > 99) phoenixdown = 99;
         Asclepius_Meet++;
+        infile.close();
     }
 }
 
@@ -621,6 +640,7 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
             StatusDeadline(HP, level, StatusCheck1, StatusCheck2, levelSave, maxHP, ShamanMeet, VajshMeet);
         }
         else if (event[i] == "19"){
+            //cout << asclepius_pack << " ";
             Asclepius_Process(asclepius_pack, remedy, phoenixdown, maidenkiss);
             if (BadEffect1 != 0){
                 if (remedy >= 1){
@@ -638,7 +658,6 @@ void EventProcess(string event[], int size, int & HP, int & level, int & remedy,
                     BadEffect2 = 0;
                 }
             }
-    
         }
         else{
             PickingUpProcess(event[i], mush_ghost, asclepius_pack, merlin_pack, HP, level, remedy, maidenkiss, phoenixdown, rescue, maxHP, BadEffect1, BadEffect2, levelSave, StatusCheck1, StatusCheck2, ShamanMeet, VajshMeet);
@@ -682,7 +701,7 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     }
     getline(infile, str2);
     istringstream s2(str2);
-    string event[100000];
+    string event[100];
     int i = 0;
     while (s2){
         if (s2){
