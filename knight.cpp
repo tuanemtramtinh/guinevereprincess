@@ -174,15 +174,21 @@ void Mush_Ghost_Code_2(int n, int arr[], int & HP, int maxHP){
     }
     if (count == 1){
         if (maxIndex == 0){
-            for (int i = 0; i < n - 1; i++){
-                if (arr[i] > arr[i + 1]){
-                    check1 = true;
-                    check2 = true;
-                }
-                else {
-                    check1 = false;
-                    check2 = false;
-                    break;
+            if (n == 1){
+                check1 = true;
+                check2 = true;
+            }
+            else{
+                for (int i = 0; i < n - 1; i++){
+                    if (arr[i] > arr[i + 1]){
+                        check1 = true;
+                        check2 = true;
+                    }
+                    else {
+                        check1 = false;
+                        check2 = false;
+                        break;
+                    }
                 }
             }
         }
@@ -216,7 +222,6 @@ void Mush_Ghost_Code_2(int n, int arr[], int & HP, int maxHP){
                 }
             }
         }
-        //cout << check1 << " " << check2 << endl;
         if (check1 == true && check2 == true){
             HP = HP - (max + maxIndex);
         }
@@ -268,10 +273,6 @@ void Mush_Ghost_Code_4(int n, int arr[], int & HP, int maxHP){
         }
         else temp[i] = (17 * temp[i] + 9) % 257;
     }
-    /*for (int i = 0; i < n; i++){
-        cout << temp[i] << " ";
-    }
-    cout << endl;*/
     int max2_3x, max2_3i; //max3x, max3i là số lớn nhất trong 3 số đầu tiên của dãy
     if (n >= 3){
         if (temp[0] == temp[1] && temp[1] == temp[2] && temp[0] == temp[2]) {
